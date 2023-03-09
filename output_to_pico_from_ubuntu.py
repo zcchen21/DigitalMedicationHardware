@@ -26,13 +26,35 @@ msg = ''
 i = 1
 
 while True:
-    print('i is ' + str(i))
-    if i < 6:
-        msg = str(i)
-        i += 1
-    else:
-        msg = ''
-        i = 1
+    msg = '1 2 3 4'
     handler.send(msg)
     print('msg: ' + msg)
-    time.sleep(3)
+    time.sleep(2)
+    msg = ''
+    handler.send(msg)
+    print('msg: ' + msg)
+    time.sleep(2)
+    msg = ' 1  3 '
+    handler.send(msg)
+    print('msg: ' + msg)
+    time.sleep(2)
+    msg = ''
+    handler.send(msg)
+    print('msg: ' + msg)
+    time.sleep(2)
+    msg = '2   4'
+    handler.send(msg)
+    print('msg: ' + msg)
+    time.sleep(2)
+    msg = ''
+    handler.send(msg)
+    print('msg: ' + msg)
+    time.sleep(2)
+    msg = '2 3 4'
+    handler.send(msg)
+    print('msg: ' + msg)
+    time.sleep(2)
+    msg = ''
+    handler.send(msg)
+    print('msg: ' + msg)
+    time.sleep(2)
