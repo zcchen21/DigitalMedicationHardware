@@ -5,6 +5,12 @@ import uselect
 from sys import stdin
 
 led = Pin("LED", Pin.OUT)
+led_yellow = Pin(10, Pin.OUT)
+led_green = Pin(11, Pin.OUT)
+led_red = Pin(12, Pin.OUT)
+led_blue = Pin(13, Pin.OUT)
+# buzzer = Pin(28, Pin.OUT)
+# button = Pin(15, Pin.IN, Pin.PULL_DOWN)
 
 TERMINATOR = '\n'
 
@@ -39,10 +45,31 @@ def read_serial_input():
 #     else:
 #         input_line_this_tick = ""
 
+
 while True:
     read_serial_input()  
-    if input_line_this_tick == '1' or input_line_this_tick == '3' or input_line_this_tick == '5':
-        led.value(1)
-    elif input_line_this_tick == '2' or input_line_this_tick == '4' or input_line_this_tick == '6':
-        led.value(0)
+#     if input_line_this_tick == '1' or input_line_this_tick == '3' or input_line_this_tick == '5':
+#         led.value(1)
+#     elif input_line_this_tick == '2' or input_line_this_tick == '4' or input_line_this_tick == '6':
+#         led.value(0)
+#     input_line_this_tick = input('Enter an input: ')
+    if input_line_this_tick:
+        inputs = input_line_this_tick.strip().split()
+        print(inputs)
+        if '1' in inputs:
+            led_yellow.on()
+        if '2' in inputs:
+            led_green.on()
+        if '3' in inputs:
+            led_red.on()
+        if '4' in inputs:
+            led_blue.on()
+        time.sleep(2)
+    else:
+        led_yellow.off()
+        led_green.off()
+        led_red.off()
+        led_blue.off()
+        
     input_line_this_tick = ""
+    
