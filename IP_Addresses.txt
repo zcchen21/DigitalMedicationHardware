@@ -3,3 +3,6 @@ Mercer IP Address:
 
 ECE 165 IP Address:
 128.95.31.157
+
+ECE 165 NEW IP Address:
+128.95.31.141
