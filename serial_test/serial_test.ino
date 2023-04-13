@@ -2,7 +2,7 @@
 #define BLUE 12
 #define GREEN 11
 #define RED 10
-#define BUTTON 7
+#define BUTTON 3
 
 bool flag = 0;
 //char data[1];
