@@ -13,7 +13,7 @@ void setup() {
     pinMode(GREEN, OUTPUT);
     pinMode(RED, OUTPUT);
     pinMode(BUTTON, INPUT);
-    attachInterrupt(digitalPinToInterrupt(BUTTON), ISR, RISING);
+    attachInterrupt(digitalPinToInterrupt(BUTTON), isr, RISING);
     Serial.begin(9600);
 }
 
@@ -36,7 +36,7 @@ void loop() {
 
 
 
-void ISR() {
+void isr() {
     flag = 0;
     clear_LEDs();
 }
