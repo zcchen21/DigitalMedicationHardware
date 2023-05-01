@@ -13,7 +13,7 @@ app.use(express.json());
 app.use(express.urlencoded({extended: true}));
 app.use(cors());
 
-app.get("/", (req, res) => {
+app.post("/", (req, res) => {
   if (req.body.command) {
     const arg = req.body.command.trim();
     console.log(`arg: ${arg}`);
