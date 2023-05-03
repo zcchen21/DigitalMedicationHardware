@@ -1,3 +1,4 @@
+// define pin numbers for LEDs and button
 #define YELLOW 13
 #define BLUE 12
 #define GREEN 11
@@ -5,6 +6,8 @@
 #define BUTTON 3
 
 volatile bool flag;
+int compartment;
+int amount;
 
 void setup() {
     pinMode(YELLOW, OUTPUT);
@@ -20,8 +23,9 @@ void setup() {
 
 void loop() {
     if (Serial.available()) {
-        String data = Serial.readStringUntil('\n');
-        dispense(data);
+        compartment = Serial.read();
+        amount = Serial.read();
+        dispense(compartment, amount);
         flag = 1;
     }
 }
@@ -43,14 +47,20 @@ void clear_LEDs() {
     digitalWrite(RED, LOW);
 }
 
-void dispense(String data) {
-    if (data == "1") {
+void dispense(int compartment, int amount) {
+    for (int i = 0; i < amount; i++) {
+        dispenseOne(compartment);
+    }
+}
+
+void dispenseOne(int compartment) {
+    if (compartment == 1) {
         digitalWrite(YELLOW, HIGH);
-    } else if (data == "2") {
+    } else if (compartment == 2) {
         digitalWrite(GREEN, HIGH);
-    } else if (data == "3") {
+    } else if (compartment == 3) {
         digitalWrite(RED, HIGH);
-    } else if (data == "4") {
+    } else if (compartment == 4) {
         digitalWrite(BLUE, HIGH);
     } 
 }
