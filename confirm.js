@@ -8,7 +8,7 @@ const port = new SerialPort('/dev/ttyACM0', { baudRate: 9600 });
 const parser = new ReadlineParser();
 port.pipe(parser);
 
-const url = 'http://example.com/confirm';
+const url = 'http://medmanageuw.loca.lt';
 
 parser.on('data', (data) => {
     axios.post(url, {

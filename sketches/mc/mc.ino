@@ -23,8 +23,7 @@ void setup() {
 
 void loop() {
     if (Serial.available()) {
-        compartment = Serial.read();
-        amount = Serial.read();
+        data = Serial.rea
         dispense(compartment, amount);
         flag = 1;
     }
