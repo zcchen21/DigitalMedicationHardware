@@ -6,3 +6,6 @@ ECE 165 IP Address:
 
 ECE 165 NEW IP Address:
 128.95.31.141
+
+Temp IP Address:
+10.0.0.182
