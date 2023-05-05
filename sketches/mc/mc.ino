@@ -74,6 +74,9 @@ void clear_LEDs() {
 void dispense(int compartment, int amount) {
     for (int i = 0; i < amount; i++) {
         dispenseOne(compartment);
+        delay(200);
+        clear_LEDs();
+        delay(200);
     }
 }
 
