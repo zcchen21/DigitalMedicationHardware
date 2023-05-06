@@ -10,6 +10,6 @@ if __name__ == '__main__':
     while True:
         msg = input("Enter a message: ")
         ser.write(msg.encode('utf-8'))
-        time.sleep(0.1)
+        time.sleep(0.5)
         print(ser.readline().decode('utf-8').rstrip())
-        time.sleep(0.1)
+        time.sleep(0.5)

@@ -3,13 +3,13 @@
 
 // define pin numbers for LEDs and button
 #define YELLOW 13
-#define BLUE 12
-#define GREEN 11
-#define RED 10
+#define GREEN 12
+#define RED 11
+#define BLUE 10
 #define BUTTON 3
 
 // size of the buffer that contains the instruction
-#define BUF_SIZE 20
+#define BUF_SIZE 50
 
 volatile bool flag;
 int compartment;
@@ -41,11 +41,14 @@ void setup() {
 void loop() {
     if (Serial.available()) {
         Serial.readBytesUntil('/n', data, BUF_SIZE);
+        // Serial.print("You sent me: ");
+        // Serial.println(data);
         parseDispense(data);
-        Serial.print("Compartment ");
-        Serial.print(compartment);
-        Serial.print(" Amount: ");
-        Serial.println(amount);
+        resetBuf();
+        // Serial.print("Compartment: ");
+        // Serial.print(compartment);
+        // Serial.print(" Amount: ");
+        // Serial.println(amount);
         dispense(compartment, amount);
         flag = 1;
     }
@@ -56,16 +59,20 @@ void loop() {
 void isr() {
     if (flag) {
         flag = 0;
-        Serial.write(1);
+        Serial.println(1);
         clear_LEDs();
     }
 }
 
 void parseDispense(char* str) {
     char* token = strtok(str, " ");
-    int compartment = atoi(token);
+    compartment = atoi(token);
     token = strtok(NULL, " ");
-    int amount = atoi(token);
+    amount = atoi(token);
+}
+
+void resetBuf() {
+    memset(data, 0, sizeof(data));
 }
 
 void clear_LEDs() {
