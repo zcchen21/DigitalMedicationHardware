@@ -42,6 +42,10 @@ void loop() {
     if (Serial.available()) {
         Serial.readBytesUntil('/n', data, BUF_SIZE);
         parseDispense(data);
+        Serial.print("Compartment ");
+        Serial.print(compartment);
+        Serial.print(" Amount: ");
+        Serial.println(amount);
         dispense(compartment, amount);
         flag = 1;
     }
