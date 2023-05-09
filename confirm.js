@@ -1,18 +1,34 @@
 "use strict";
 
-const SerialPort = require('serialport');
-const Readline = require('@serialport/parser-readline');
+const { SerialPort } = require('serialport');
+//const Readline = require('@serialport/parser-readline');
 const axios = require('axios');
 
-const port = new SerialPort('/dev/ttyACM0', { baudRate: 9600 });
-const parser = new ReadlineParser();
-port.pipe(parser);
+const port = new SerialPort({
+    path: '/dev/ttyACM0',
+    baudRate: 9600
+  })
+//const parser = new ReadlineParser();
+//port.pipe(parser);
 
-const url = 'http://medmanageuw.loca.lt';
+const site_url = 'https://f909-2601-600-a480-2900-18eb-4ff-fe88-7554.ngrok-free.app';
 
-parser.on('data', (data) => {
-    axios.post(url, {
-        message: data
+port.on('data', (data) => {
+    console.log(`Received data: ${data}`);
+    confirm_post();
+});
+
+
+function confirm_post() {
+    axios({
+        method: 'post' ,
+        url: site_url ,
+        data: {
+            medicationId: 123 ,
+            compartmentId: 1 ,
+            success: true ,
+            message: 'test'
+        }
     })
     .then((response) => {
         console.log(response);
@@ -20,4 +36,4 @@ parser.on('data', (data) => {
     .catch((error) => {
         console.error(error);
     });
-});
+}

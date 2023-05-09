@@ -59,7 +59,7 @@ void loop() {
 void isr() {
     if (flag) {
         flag = 0;
-        Serial.println(1);
+        Serial.write(1);
         clear_LEDs();
     }
 }
@@ -84,10 +84,10 @@ void clear_LEDs() {
 
 void dispense(int compartment, int amount) {
     for (int i = 0; i < amount; i++) {
-        dispenseOne(compartment);
         delay(200);
         clear_LEDs();
         delay(200);
+        dispenseOne(compartment);
     }
 }
 
