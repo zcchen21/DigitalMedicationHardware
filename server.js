@@ -22,64 +22,100 @@ app.post("/assign", async (req, res) => {
     const compartmentId = req.body.compartmentId;
     const quantity = req.body.quantity;
 
-    if (!medicationId || !compartmentId || !quantity) {
-      res.status(400).send("Missing one or more required params.");
-      return;
-    }
-
     console.log(`medicationId: ${medicationId}`);
     console.log(`compartmentId: ${compartmentId}`);
     console.log(`quantity: ${quantity}`);
 
+    if (!medicationId || !compartmentId || !quantity) {
+      res.status(400).json({ success: false,
+                             message: "Missing one or more required params." });
+      return;
+    }
+
+    if (medicationId.length != compartmentId.length || compartmentId.length != quantity.length) {
+      res.status(400).json({ success: false,
+                             message: "The number of medicationId, compartmentId, and quantity should be equal." });
+      return;
+    }
+
+    for (let i = 0; i < compartmentId.length; i++) {
+      if (compartmentId[i] != 1 && compartmentId[i] != 2 && compartmentId[i] != 3 && compartmentId[i] != 4) {
+        res.status(400).json({ success: false,
+                               message: "CompartmentId must be 1, 2, 3, or 4." });
+        return;
+      }
+    }
+
     const db = await DBConnection();
-    let assignQry = "UPDATE medications SET medication_id=?, quantity=? WHERE compartment_num=?";
-    await db.run(assignQry, [medicationId, quantity, compartmentId]);
+
+    for (let i = 0; i < medicationId.length; i++) {
+      let assignQry = "UPDATE medications SET medication_id=?, quantity=? WHERE compartment_num=?";
+      await db.run(assignQry, [medicationId[i], quantity[i], compartmentId[i]]);
+    }
+
     await db.close();
 
     res.status(200).json({ medicationId: medicationId,
                            compartmentId: compartmentId,
+                           quantity: quantity,
                            success: true,
-                           message: "Successfully assigned medication." });
+                           message: "Successfully assigned medications." });
 
   } catch (error) {
-    res.status(500).json("An error occurred on the server while assigning medication.");
+    res.status(500).json({ success: false,
+                           message: "An error occurred on the server while assigning medications." });
   }
 });
 
 // dispense a medication with the specified quantity
 app.post("/dispense", async (req, res) => {
   try {
-    if (!req.body.medication_id || !req.body.quantity) {
-      res.status(400).json("Missing one or more required params.");
+    const medicationId = req.body.medicationId;
+    const quantity = req.body.quantity;
+
+    console.log(`medicationId: ${medicationId}`);
+    console.log(`quantity: ${quantity}`);
+
+    if (!medicationId || !quantity) {
+      res.status(400).json({ success: false,
+                             message: "Missing one or more required params." });
       return;
     }
 
-    const medication_id = req.body.medication_id.trim();
-    const quantity = req.body.quantity.trim();
-
-    console.log(`medication_id: ${medication_id}`);
-    console.log(`quantity: ${quantity}`);
+    if (medicationId.length != quantity.length) {
+      res.status(400).json({ success: false,
+                             message: "The number of medicationId and quantity should be equal." });
+      return;
+    }
 
     const db = await DBConnection();
+    let arg = "";
+    let quantityAvailable = [];
+
     const quantityQry = "SELECT quantity FROM medications WHERE medication_id=?";
-    const quantityAvailable = await db.get(quantityQry, [medication_id]);
 
-    console.log(`quantityAvailable: ${quantityAvailable}`);
+    for (let i = 0; i < medicationId.length; i++) {
+      let info = await db.get(quantityQry, [medicationId[i]]);
 
-    if (quantityAvailable.length === 0) {
-      await db.close();
-      res.status(400).json("Dispense failed. Medication ID couldn't be found in the dispenser.");
+      if (!info) {
+        res.status(400).json({ success: false,
+                               message: `MedicationId ${medicationId[i]} is not found in the dispenser.` });
+        return;
+      }
+
+      if (parseInt(info.quantity) < parseInt(quantity)) {
+        res.status(400).json({ success: false,
+                               message: `Not enough pills left for medicationId ${medicationId[i]}. Requesting for ${quantity[i]}, but only ${info.quantity} is available.` });
+        return;
+      }
+
+      quantityAvailable.push(info.quantity);
+      arg += medicationId[i] + " " + quantity[i] + " ";
     }
 
-    if (quantityAvailable < quantity) {
-      await db.close();
-      res.status(400).json("Dispense failed. Not enough pills left");
-    }
-
-    const arg = medication_id + " " + quantity;
     console.log(`arg: ${arg}`);
 
-    const pythonProcess = spawn("python3", ["/home/ubuntu/demo_script.py", arg]);
+    const pythonProcess = spawn("python3", ["/home/ubuntu/MedManage/server_script.py", arg]);
 
     pythonProcess.stdout.on('data', (data) => {
       console.log(`stdout: ${data}`);
@@ -87,7 +123,8 @@ app.post("/dispense", async (req, res) => {
 
     pythonProcess.stderr.on('data', (data) => {
       console.error(`stderr: ${data}`);
-      res.status(400).json("Dispense failed. There's a problem with the dispenser.");
+      res.status(400).json({ success: false,
+                             message: "There is a problem with the dispenser." });
     });
 
     pythonProcess.on('close', (code) => {
@@ -95,33 +132,76 @@ app.post("/dispense", async (req, res) => {
     });
 
     const updateQry = "UPDATE medications SET quantity=? WHERE medication_id=?";
-    await db.run(updateQry, [quantityAvailable - quantity, medication_id]);
+
+    for (let i = 0; i < medicationId.length; i++) {
+      await db.run(updateQry, [parseInt(quantityAvailable[i]) - parseInt(quantity[i]), medicationId[i]]);
+      quantityAvailable[i] = parseInt(quantityAvailable[i]) - parseInt(quantity[i]);
+    }
+
     await db.close();
-    res.status(200).json("Dispense succeeded.");
+
+    res.status(200).json({ medicationId: medicationId,
+                           newQuantity: quantityAvailable,
+                           success: true,
+                           message: "Successfully dispensed medications." });
 
   } catch (error) {
-    res.status(500).json("An error occurred on the server. Try again later.");
+    res.status(500).json({ success: false,
+                           message: "An error occurred on the server while dispensing medications." });
   }
 });
 
 // refill a medication with the specified quantity
 app.post("/refill", async (req, res) => {
   try {
-    if (!req.body.medication_id || !req.body.quantity) {
-      res.status(400).json("Missing one or more required params.");
+    const medicationId = req.body.medicationId;
+    const quantity = req.body.quantity;
+
+    console.log(`medicationId: ${medicationId}`);
+    console.log(`quantity: ${quantity}`);
+
+    if (!medicationId || !quantity) {
+      res.status(400).json({ success: false,
+                             message: "Missing one or more required params." });
       return;
     }
 
-    const medication_id = req.body.medication_id.trim();
-    const quantity = req.body.quantity.trim();
+    if (medicationId.length != quantity.length) {
+      res.status(400).json({ success: false,
+                             message: "The number of medicationId and quantity should be equal." });
+      return;
+    }
 
-    console.log(`medication_id: ${medication_id}`);
-    console.log(`quantity: ${quantity}`);
+    const db = await DBConnection();
+    let newQuantity = [];
 
+    for (let i = 0; i < medicationId.length; i++) {
+      let getInfoQry = "SELECT quantity FROM medications WHERE medication_id=?";
+      let info = await db.get(getInfoQry, [medicationId[i]]);
 
+      if (!info) {
+        res.status(400).json({ success: false,
+                               message: `MedicationId ${medicationId[i]} is not found in the dispenser.` });
+        return;
+      }
+
+      let refillQry = "UPDATE medications SET quantity=? WHERE medication_id=?";
+      await db.run(refillQry, [parseInt(info.quantity) + parseInt(quantity[i]), medicationId[i]]);
+
+      info = await db.get(getInfoQry, [medicationId[i]]);
+      newQuantity.push(parseInt(info.quantity));
+    }
+
+    await db.close();
+
+    res.status(200).json({ medicationId: medicationId,
+                           newQuantity: newQuantity,
+                           success: true,
+                           message: "Successfully refilled medications." });
 
   } catch (error) {
-    res.status(500).json("An error occurred on the server. Try again later.");
+    res.status(500).json({ success: false,
+                           message: "An error occurred on the server while refilling medications." });
   }
 });
 
