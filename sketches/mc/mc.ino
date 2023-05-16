@@ -8,6 +8,14 @@
 #define BLUE 10
 #define BUTTON 3
 
+// define pin numbers and steps for the stepper motors
+#define STEPS_PER_REV 2048
+#define MOTOR_SPEED 15
+#define MOTOR1_PIN1 TODO
+#define MOTOR1_PIN2 TODO
+#define MOTOR1_PIN3 TODO
+#define MOTOR1_PIN4 TODO
+
 // size of the buffer that contains the instruction
 #define BUF_SIZE 50
 
@@ -16,12 +24,16 @@ int compartment;
 int amount;
 char data[BUF_SIZE];
 
+Stepper stepper(STEPS_PER_REV, MOTOR1_PIN1, MOTOR1_PIN2, MOTOR1_PIN3, MOTOR1_PIN4);
+
 // SETUP:
 //  sets the four LEDs to be outputs, the button to be an input
 //  sets the button to be an interrupt
 //  sets the LEDs to low
 //  sets flag to zero
 void setup() {
+    Serial.begin(9600);
+    myStepper.setSpeed(MOTOR_SPEED);
     pinMode(YELLOW, OUTPUT);
     pinMode(BLUE, OUTPUT);
     pinMode(GREEN, OUTPUT);
@@ -30,7 +42,6 @@ void setup() {
     attachInterrupt(digitalPinToInterrupt(BUTTON), isr, RISING);
     clear_LEDs();
     flag = 0;
-    Serial.begin(9600);
 }
 
 // LOOP:
@@ -88,6 +99,9 @@ void dispense(int compartment, int amount) {
         clear_LEDs();
         delay(200);
         dispenseOne(compartment);
+
+
+
     }
 }
 

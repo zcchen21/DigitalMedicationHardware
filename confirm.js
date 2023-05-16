@@ -3,6 +3,7 @@
 const { SerialPort } = require('serialport');
 //const Readline = require('@serialport/parser-readline');
 const axios = require('axios');
+const axiosRetry = require('axios-retry');
 
 const port = new SerialPort({
     path: '/dev/ttyACM0',
@@ -10,6 +11,11 @@ const port = new SerialPort({
   })
 //const parser = new ReadlineParser();
 //port.pipe(parser);
+
+axiosRetry(axios, { 
+    retries: 3 ,
+    retryDelay: axiosRetry.exponentialDelay
+});
 
 const site_url = 'https://f909-2601-600-a480-2900-18eb-4ff-fe88-7554.ngrok-free.app';
 
@@ -24,10 +30,10 @@ function confirm_post() {
         method: 'post' ,
         url: site_url ,
         data: {
-            medicationId: 123 ,
-            compartmentId: 1 ,
-            success: true ,
-            message: 'test'
+            // medicationId: 123 ,
+            // compartmentId: 1 ,
+            success: true
+            // message: 'test' ,
         }
     })
     .then((response) => {
