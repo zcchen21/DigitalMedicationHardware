@@ -1,8 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <Stepper.h>
 
 // define pin numbers for LEDs and button
-#define YELLOW 13
+#define YELLOW 8
 #define GREEN 12
 #define RED 11
 #define BLUE 10
@@ -24,7 +25,7 @@ int compartment;
 int amount;
 char data[BUF_SIZE];
 
-Stepper stepper(STEPS_PER_REV, MOTOR1_PIN1, MOTOR1_PIN2, MOTOR1_PIN3, MOTOR1_PIN4);
+// Stepper stepper(STEPS_PER_REV, MOTOR1_PIN1, MOTOR1_PIN2, MOTOR1_PIN3, MOTOR1_PIN4);
 
 // SETUP:
 //  sets the four LEDs to be outputs, the button to be an input
@@ -33,7 +34,7 @@ Stepper stepper(STEPS_PER_REV, MOTOR1_PIN1, MOTOR1_PIN2, MOTOR1_PIN3, MOTOR1_PIN
 //  sets flag to zero
 void setup() {
     Serial.begin(9600);
-    myStepper.setSpeed(MOTOR_SPEED);
+    // myStepper.setSpeed(MOTOR_SPEED);
     pinMode(YELLOW, OUTPUT);
     pinMode(BLUE, OUTPUT);
     pinMode(GREEN, OUTPUT);
@@ -51,7 +52,7 @@ void setup() {
 //  sets flag to indicate that medication has been dispensed, but not yet taken
 void loop() {
     if (Serial.available()) {
-        Serial.readBytesUntil('/n', data, BUF_SIZE);
+        Serial.readBytesUntil('\n', data, BUF_SIZE);
         // Serial.print("You sent me: ");
         // Serial.println(data);
         parseDispense(data);
@@ -114,5 +115,5 @@ void dispenseOne(int compartment) {
         digitalWrite(RED, HIGH);
     } else if (compartment == 4) {
         digitalWrite(BLUE, HIGH);
-    } 
+    }
 }

@@ -12,15 +12,18 @@ const port = new SerialPort({
 //const parser = new ReadlineParser();
 //port.pipe(parser);
 
-axiosRetry(axios, { 
+axiosRetry(axios, {
     retries: 3 ,
     retryDelay: axiosRetry.exponentialDelay
 });
 
-const site_url = 'https://f909-2601-600-a480-2900-18eb-4ff-fe88-7554.ngrok-free.app';
+let confirmed = true;
+
+const site_url = 'https://medmanageuw.ngrok.app';
 
 port.on('data', (data) => {
     console.log(`Received data: ${data}`);
+    confirmed = true;
     confirm_post();
 });
 

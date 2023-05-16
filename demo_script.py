@@ -11,8 +11,8 @@ if __name__ == '__main__':
         msg = input("Enter a message: ")
         ser.write(msg.encode('utf-8'))
         time.sleep(0.5)
-        print(ser.readline().decode('utf-8').rstrip())
-        time.sleep(0.5)
+        # print(ser.readline().decode('utf-8').rstrip())
+        # time.sleep(0.5)
         # if (ser.in_waiting):
         #     print(1)
         #     ser.reset_input_buffer()
