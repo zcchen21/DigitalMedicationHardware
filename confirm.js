@@ -17,13 +17,15 @@ axiosRetry(axios, {
     retryDelay: axiosRetry.exponentialDelay
 });
 
-let confirmed = true;
+let confirmedObject = {
+  confirmed: true
+};
 
 const site_url = 'https://medmanageuw.ngrok.app';
 
 port.on('data', (data) => {
     console.log(`Received data: ${data}`);
-    confirmed = true;
+    confirmedObject.confirmed = true;
     confirm_post();
 });
 
@@ -46,3 +48,5 @@ function confirm_post() {
         console.error(error);
     });
 }
+
+module.exports = confirmedObject;

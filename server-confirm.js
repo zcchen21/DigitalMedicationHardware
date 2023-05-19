@@ -1,6 +1,53 @@
 "use strict";
 
-const confirmedObject = require("/home/ubuntu/MedManage/confirm.js");
+const { SerialPort } = require('serialport');
+//const Readline = require('@serialport/parser-readline');
+const axios = require('axios');
+const axiosRetry = require('axios-retry');
+
+const serialPort = new SerialPort({
+    path: '/dev/ttyACM0',
+    baudRate: 9600
+  })
+//const parser = new ReadlineParser();
+//port.pipe(parser);
+
+axiosRetry(axios, {
+    retries: 3 ,
+    retryDelay: axiosRetry.exponentialDelay
+});
+
+let confirmed = true;
+
+const site_url = 'https://medmanageuw.ngrok.app';
+
+serialPort.on('data', (data) => {
+    console.log(`Received data: ${data}`);
+    confirmed = true;
+    confirm_post();
+});
+
+
+function confirm_post() {
+    axios({
+        method: 'post' ,
+        url: site_url ,
+        data: {
+            // medicationId: 123 ,
+            // compartmentId: 1 ,
+            success: true
+            // message: 'test' ,
+        }
+    })
+    .then((response) => {
+        console.log(response);
+    })
+    .catch((error) => {
+        console.error(error);
+    });
+}
+
+
 
 const express = require("express");
 const cors = require("cors");
@@ -17,6 +64,9 @@ app.use(express.json());
 app.use(express.urlencoded({extended: true}));
 app.use(cors());
 
+// app.post("/confirm", async (req, res) => {
+
+// });
 
 // assign medications to a compartment
 app.post("/assign", async (req, res) => {
@@ -70,13 +120,12 @@ app.post("/assign", async (req, res) => {
   }
 });
 
-
 // dispense a medication with the specified quantity
 app.post("/dispense", async (req, res) => {
   try {
-    if (!confirmedObject.confirmed) {
+    if (!confirmed) {
       res.status(400).json({ success: false,
-                             message: "Haven't received confirmation from the dispenser yet" });
+                             message: "Haven't received confirmation yet" });
       return;
     }
 
@@ -150,7 +199,7 @@ app.post("/dispense", async (req, res) => {
 
     await db.close();
 
-    confirmedObject.confirmed = false;
+    confirmed = false;
 
     res.status(200).json({ medicationId: medicationId,
                            newQuantity: quantityAvailable,
@@ -162,7 +211,6 @@ app.post("/dispense", async (req, res) => {
                            message: "An error occurred on the server while dispensing medications." });
   }
 });
-
 
 // refill a medication with the specified quantity
 app.post("/refill", async (req, res) => {
