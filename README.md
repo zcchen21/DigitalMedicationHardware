@@ -14,3 +14,9 @@ A folder containing files used for the dispenser server. For the final product, 
 ## misc
 A folder containing various miscellaneous files. 
 
+# User Manual
+
+## Server
+PM2 (https://pm2.keymetrics.io/) is used to keep the server running. It automatically starts the server on reboot, and keeps it running indefinitely. PM2 is also used to keep ngrok running, which provides a tunnel to the localhost that the server runs on. As long as both the server-confirm process and ngrok process are running on PM2, the server will be active.
+
+## Wiring
