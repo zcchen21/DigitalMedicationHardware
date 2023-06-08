@@ -51,10 +51,13 @@ Stepper stepper4(STEPS_PER_REV, MOTOR4_PIN1, MOTOR4_PIN2, MOTOR4_PIN3, MOTOR4_PI
 void setup() {
     Serial.begin(9600);
     stepper1.setSpeed(MOTOR_SPEED);
+    stepper2.setSpeed(MOTOR_SPEED);
+    stepper3.setSpeed(MOTOR_SPEED);
+    stepper4.setSpeed(MOTOR_SPEED);
     pinMode(YELLOW, OUTPUT);
-    pinMode(BLUE, OUTPUT);
-    pinMode(GREEN, OUTPUT);
-    pinMode(RED, OUTPUT);
+    //pinMode(BLUE, OUTPUT);
+    //pinMode(GREEN, OUTPUT);
+    //pinMode(RED, OUTPUT);
     pinMode(BUTTON, INPUT);
     for (int i = 22; i < 54; i++) {
         pinMode(i, OUTPUT);
@@ -125,9 +128,9 @@ void resetBuf() {
 
 void clear_LEDs() {
     digitalWrite(YELLOW, LOW);
-    digitalWrite(BLUE, LOW);
-    digitalWrite(GREEN, LOW);
-    digitalWrite(RED, LOW);
+    //digitalWrite(BLUE, LOW);
+    //digitalWrite(GREEN, LOW);
+    //digitalWrite(RED, LOW);
 }
 
 void dispense(int compartment, int amount) {
