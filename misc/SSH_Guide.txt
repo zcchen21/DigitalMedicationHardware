@@ -1,0 +1,13 @@
+1. Install PuTTY: https://www.putty.org/
+2. Check IP_Addresses.txt for IP address of Le Potato
+3. Open PuTTY
+4. Under Connection Type, select SSH
+5. Under Host Name, put the IP address
+6. Under Port, put 22
+7. Save the session so you don't have to type it in every time
+8. Press open
+9. Login:
+   Username - ubuntu
+   Password - MedManage
+   
+You are now to the bash shell of Le Potato!
